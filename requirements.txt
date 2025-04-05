@@ -62,7 +62,7 @@ markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 matplotlib==3.9.2
 mdurl==0.1.2
-ml-dtypes==0.4.1
+ml_dtypes==0.5.1
 mpmath==1.3.0
 multitasking==0.0.11
 namex==0.0.8
@@ -115,9 +115,9 @@ statsmodels==0.14.4
 streamlit==1.41.1
 sympy==1.13.3
 tenacity==9.0.0
-tensorboard==2.17.1
+tensorboard==2.19.0
 tensorboard-data-server==0.7.2
-tensorflow==2.17.0
+tensorflow==2.19.0
 tensorflow-intel==2.17.0
 termcolor==2.4.0
 threadpoolctl==3.5.0
