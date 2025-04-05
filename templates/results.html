@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ selected_crypto }} Price Prediction Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ selected_crypto }} Price Prediction Results</h1>
+            <p>Forecast for the next {{ prediction_days }} days</p>
+            <div class="back-link">
+                <a href="/" class="btn btn-secondary">← Back to Selection</a>
+            </div>
+        </header>
+
+        <div class="results-content">
+            <div class="section">
+                <h2>Price Prediction Chart</h2>
+                <div class="chart-container">
+                    <div id="price-chart"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Predicted Prices</h2>
+                <div class="predictions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Predicted Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in predictions %}
+                                <tr>
+                                    <td>{{ prediction.date }}</td>
+                                    <td>{{ prediction.price }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="download-section">
+                    <a href="{{ url_for('download', filename=csv_filename) }}" class="btn btn-download">Download Predictions (CSV)</a>
+                    <a href="{{ url_for('download', filename=model_filename) }}" class="btn btn-download">Download Model</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Model Performance</h2>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <h3>MAE</h3>
+                        <p>${{ mae|round(2) }}</p>
+                        <small>Mean Absolute Error</small>
+                    </div>
+                    <div class="metric">
+                        <h3>RMSE</h3>
+                        <p>${{ rmse|round(2) }}</p>
+                        <small>Root Mean Square Error</small>
+                    </div>
+                    <div class="metric">
+                        <h3>MAPE</h3>
+                        <p>{{ mape|round(2) }}%</p>
+                        <small>Mean Absolute Percentage Error</small>
+                    </div>
+                    <div class="metric">
+                        <h3>MSE</h3>
+                        <p>${{ mse|round(2) }}</p>
+                        <small>Mean Square Error</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Feature Importance</h2>
+                <div class="chart-container">
+                    <div id="feature-chart"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Technical Indicators</h2>
+                <div class="tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="moving-averages">Moving Averages</button>
+                        <button class="tab-btn" data-tab="rsi">RSI</button>
+                        <button class="tab-btn" data-tab="macd">MACD</button>
+                        <button class="tab-btn" data-tab="bollinger">Bollinger Bands</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="moving-averages-tab">
+                            <div id="moving-averages-chart" class="chart-container"></div>
+                        </div>
+                        <div class="tab-pane" id="rsi-tab">
+                            <div id="rsi-chart" class="chart-container"></div>
+                        </div>
+                        <div class="tab-pane" id="macd-tab">
+                            <div id="macd-chart" class="chart-container"></div>
+                        </div>
+                        <div class="tab-pane" id="bollinger-tab">
+                            <div id="bollinger-chart" class="chart-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Data Summary</h2>
+                <div class="tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="raw-data">Raw Data</button>
+                        <button class="tab-btn" data-tab="processed-data">Processed Data</button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="raw-data-tab">
+                            <div class="data-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Open</th>
+                                            <th>High</th>
+                                            <th>Low</th>
+                                            <th>Close</th>
+                                            <th>Adj Close</th>
+                                            <th>Volume</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in raw_data %}
+                                            <tr>
+                                                <td>{{ row.Date }}</td>
+                                                <td>${{ row.Open|round(2) }}</td>
+                                                <td>${{ row.High|round(2) }}</td>
+                                                <td>${{ row.Low|round(2) }}</td>
+                                                <td>${{ row.Close|round(2) }}</td>
+                                                <td>${{ row['Adj Close']|round(2) }}</td>
+                                                <td>{{ row.Volume|int }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="processed-data-tab">
+                            <div class="data-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Close</th>
+                                            <th>MA7</th>
+                                            <th>MA14</th>
+                                            <th>RSI</th>
+                                            <th>MACD</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in proc_data %}
+                                            <tr>
+                                                <td>{{ row.Date }}</td>
+                                                <td>${{ row.Close|round(2) }}</td>
+                                                <td>${{ row.MA7|round(2) }}</td>
+                                                <td>${{ row.MA14|round(2) }}</td>
+                                                <td>{{ row.RSI|round(2) }}</td>
+                                                <td>{{ row.MACD|round(2) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Cryptocurrency Price Prediction Tool &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Render price prediction chart
+        const priceChart = {{ price_chart|safe }};
+        Plotly.newPlot('price-chart', priceChart.data, priceChart.layout);
+
+        // Render feature importance chart
+        const featureChart = {{ feature_chart|safe }};
+        Plotly.newPlot('feature-chart', featureChart.data, featureChart.layout);
+
+        // Render technical indicator charts
+        const maChart = {{ tech_charts.moving_averages|safe }};
+        const rsiChart = {{ tech_charts.rsi|safe }};
+        const macdChart = {{ tech_charts.macd|safe }};
+        const bollingerChart = {{ tech_charts.bollinger|safe }};
+
+        Plotly.newPlot('moving-averages-chart', maChart.data, maChart.layout);
+        Plotly.newPlot('rsi-chart', rsiChart.data, rsiChart.layout);
+        Plotly.newPlot('macd-chart', macdChart.data, macdChart.layout);
+        Plotly.newPlot('bollinger-chart', bollingerChart.data, bollingerChart.layout);
+
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Get the tab to activate
+                const tab = button.dataset.tab;
+
+                // Deactivate all tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+
+                // Activate the selected tab
+                button.classList.add('active');
+                document.getElementById(`${tab}-tab`).classList.add('active');
+
+                // Trigger resize to fix Plotly charts
+                window.dispatchEvent(new Event('resize'));
+            });
+        });
+    </script>
+</body>
+</html>

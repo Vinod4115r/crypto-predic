@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cryptocurrency Price Prediction</h1>
+            <p>Predict future prices using machine learning algorithms</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>Select Parameters</h2>
+                <form action="/predict" method="post">
+                    <div class="form-group">
+                        <label for="crypto">Cryptocurrency:</label>
+                        <select id="crypto" name="crypto" required>
+                            {% for crypto in cryptos %}
+                                <option value="{{ crypto }}">{{ crypto }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prediction_days">Prediction Days:</label>
+                        <input type="number" id="prediction_days" name="prediction_days" min="1" max="30" value="7" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="train_size">Training Data Size (days):</label>
+                        <input type="number" id="train_size" name="train_size" min="30" max="365" value="180" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn">Generate Predictions</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Price Prediction</h3>
+                    <p>Predict cryptocurrency prices using machine learning algorithms</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📈</div>
+                    <h3>Technical Indicators</h3>
+                    <p>Analyze with moving averages, RSI, MACD, and Bollinger Bands</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Feature Importance</h3>
+                    <p>Understand which factors influence price predictions</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Cryptocurrency Price Prediction Tool &copy; 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
